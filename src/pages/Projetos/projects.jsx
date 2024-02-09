@@ -1,13 +1,13 @@
 import { useQuery } from 'react-query';
-import { fetchPetianos } from "../../fetchs";
+import { fetchProjects } from "../../fetchs";
 
-import styles from './home.module.css';
+import styles from './projects.module.css';
 
 import { Space, Table, Tag, Spin, Tooltip } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
-const Home = () => {
-  const { data: petianos, isLoading, isError } = useQuery('petianos', fetchPetianos, {
+const Projects = () => {
+  const { data: projetos, isLoading, isError } = useQuery('projetos', fetchProjects, {
     staleTime: 60000
   })
 
@@ -19,36 +19,26 @@ const Home = () => {
       render: (text) => <span>{text}</span>,
     },
     {
-      title: 'Semestre de ingresso no PET',
-      dataIndex: 'semestreIngresso',
-      key: 'semestreIngresso',
+      title: 'Descrição',
+      dataIndex: 'descricao',
+      key: 'descricao',
+      width: '40%'
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Situação',
-      key: 'tag',
-      dataIndex: 'tag',
-      render: (_, { tag }) => {
-        const color = tag === true ? 'green' : 'red';
-
-        const state = {
-          green: 'Ativo',
-          red: 'Desligado'
-        }
-
+      title: 'Imagens',
+      dataIndex: 'imgs',
+      key: 'imgs',
+      render: (_, {imgs}) => {
         return (
-          <>
-            <Tag color={color} key={'a'}>
-              {state[color]}
-            </Tag>
-          </>
+          <div>
+            {imgs.map((img, index) => (
+              <a key={index} href={img} target="_blank" rel="noopener noreferrer">
+                Imagem {index + 1}<br></br>
+              </a>
+            ))}
+          </div>
         );
-      }
-
+      },
     },
     {
       title: 'Ações',
@@ -66,14 +56,13 @@ const Home = () => {
     },
   ];
 
-  const data = petianos?.map((petiano) => {
+  const data = projetos?.map((projeto) => {
     return (
       {
-        key: petiano.id,
-        nome: petiano.nome,
-        semestreIngresso: petiano.semestreingresso,
-        email: petiano.email,
-        tag: petiano.ativo,
+        key: projeto.id,
+        nome: projeto.nome,
+        descricao: projeto.descricao,
+        imgs: projeto.imgs
       }
     )
   })
@@ -97,4 +86,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default Projects
