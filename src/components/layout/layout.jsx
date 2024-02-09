@@ -1,32 +1,35 @@
-import React, { useState } from 'react';
+import { Layout, theme, Menu } from 'antd';
 import {
   DesktopOutlined,
-  PieChartOutlined,
+  UnorderedListOutlined
 } from '@ant-design/icons';
-import { Layout, Menu, theme } from 'antd';
 
 import styles from './layout.module.css'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Sider, Content, Footer } = Layout;
 
-function getItem(label, key, icon, children) {
+function getItem(label, key, icon) {
   return {
     key,
     icon,
-    children,
     label,
   };
 }
 
 const items = [
-  getItem('Petianos', '1', <PieChartOutlined />),
-  getItem('Projetos', '2', <DesktopOutlined />),
+  getItem('Petianos', '/', <UnorderedListOutlined />),
+  getItem('Projetos', '/projects', <DesktopOutlined />),
+  getItem('Núcleos', '/nucleos', <UnorderedListOutlined />),
 ];
 
-const LayoutPage = () => {
+const LayoutPage = ({ children }) => {
+  const navigate = useNavigate();
+
   const [collapsed, setCollapsed] = useState(false);
   const {
-    token: { colorBgContainer },
+    token: { headerBg },
   } = theme.useToken();
 
   return (
@@ -34,21 +37,28 @@ const LayoutPage = () => {
       className={styles.container}
     >
       <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-        <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+        <div className={`${styles.logo} ${collapsed ? styles.logoCollapsed : ''}`}>
+          <img src="/imgs/logoPET.png" alt="Logo petee" />
+        </div>
+        <Menu
+          theme="dark"
+          defaultSelectedKeys={['/']}
+          mode="inline" items={items}
+          onClick={({key}) => {
+            navigate(key);
+          }}
+        />
       </Sider>
       <Layout>
         <Header
           style={{
-            background: colorBgContainer,
+            background: headerBg,
           }}
-        />
+        >
+        </Header>
         <Content
         >
-          <div
-          >
-            Bill is a cat.
-          </div>
+          {children}
         </Content>
         <Footer
           className={styles.footer}
