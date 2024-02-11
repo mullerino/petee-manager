@@ -1,8 +1,13 @@
-import Home from "./pages/Home/home"
+import { QueryClient, QueryClientProvider } from 'react-query';
+import RoutesApp from './routes';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <Home />
+    <QueryClientProvider client={queryClient}>
+      <RoutesApp/>
+    </QueryClientProvider>
   )
 }
 
