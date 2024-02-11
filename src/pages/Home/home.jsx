@@ -3,13 +3,21 @@ import { fetchPetianos } from "../../fetchs";
 
 import styles from './home.module.css';
 
-import { Space, Table, Tag, Spin, Tooltip } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { Tag } from 'antd';
+
+import Content from '../../components/content/content';
+import { useModalContext } from '../../contexts/modalForm';
+import Actions from '../../components/actions/actions';
 
 const Home = () => {
   const { data: petianos, isLoading, isError } = useQuery('petianos', fetchPetianos, {
     staleTime: 60000
   })
+
+  const { openModal } = useModalContext();
+
+  // Alerta gambiarra, caso o botão de editar não seja o clicado, todos os campos são obrigatórios!!
+  const requiredField = !openModal.editMode
 
   const columns = [
     {
@@ -54,14 +62,7 @@ const Home = () => {
       title: 'Ações',
       key: 'action',
       render: (_, record) => (
-        <Space size="middle">
-          <Tooltip placement='bottom' title="Editar">
-            <a><EditOutlined /></a>
-          </Tooltip>
-          <Tooltip placement='bottom' title="Deletar">
-            <a><DeleteOutlined /></a>
-          </Tooltip>
-        </Space>
+        <Actions record={record}/>
       ),
     },
   ];
@@ -78,20 +79,93 @@ const Home = () => {
     )
   })
 
+  const fields = [
+    {
+      name: 'nome',
+      label: 'Nome',
+      required: requiredField,
+      type: 'input',
+      typeData: 'text'
+    },
+    {
+      name: 'email',
+      label: 'Email',
+      required: requiredField,
+      type: 'input',
+      typeData: 'email'
+    },
+    {
+      name: 'descricao',
+      label: 'Descrição',
+      required: requiredField,
+      type: 'textarea',
+      typeData: 'text'
+    },
+    {
+      name: 'matricula',
+      label: 'Matrícula',
+      required: requiredField,
+      type: 'input',
+      typeData: 'string'
+    },
+    {
+      name: 'telefone',
+      label: 'Telefone',
+      required: requiredField,
+      type: 'input',
+      typeData: 'string'
+    },
+    {
+      name: 'semestreingresso',
+      label: 'Semestre de Ingresso',
+      required: requiredField,
+      type: 'input',
+      typeData: 'string'
+    },
+    {
+      name: 'imagem',
+      label: 'URL da foto do petiano',
+      required: requiredField,
+      type: 'input',
+      typeData: 'url'
+    },
+    {
+      name: 'linkedln',
+      label: 'Linkedln',
+      required: requiredField,
+      type: 'input',
+      typeData: 'string',
+      placeholder: 'Ex: erikafernandes19'
+    },
+    {
+      name: 'instagram',
+      label: 'Instagram',
+      required: requiredField,
+      type: 'input',
+      typeData: 'string',
+      placeholder: 'Ex: eclsns'
+    },
+    {
+      name: 'ativo',
+      label: 'Petiano ativo?',
+      required: requiredField,
+      type: 'radio',
+      typeData: 'any',
+      options: [
+        { value: true, label: 'Sim' },
+        { value: false, label: 'Não' },
+      ],
+    },
+  ];
+
   return (
-    <div className={styles.table}>
-      <Table
+    <div className={styles.container}>
+      <Content
+        data={data}
         columns={columns}
-        dataSource={data}
-        loading={{
-          indicator: <Spin />,
-          spinning: isLoading
-        }}
-        pagination={{
-          defaultPageSize: 6,
-          showSizeChanger: true,
-          pageSizeOptions: ['6', '10', '15']
-        }}
+        isLoading={isLoading}
+        tooltipAdding={'Adicionar novo petiano'}
+        fields={fields}
       />
     </div>
   )
