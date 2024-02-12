@@ -1,7 +1,8 @@
 import { Layout, theme, Menu } from 'antd';
 import {
   DesktopOutlined,
-  UnorderedListOutlined
+  UnorderedListOutlined,
+  ApiOutlined
 } from '@ant-design/icons';
 
 import styles from './layout.module.css'
@@ -21,7 +22,7 @@ function getItem(label, key, icon) {
 const items = [
   getItem('Petianos', '/', <UnorderedListOutlined />),
   getItem('Projetos', '/projects', <DesktopOutlined />),
-  getItem('Núcleos', '/nucleos', <UnorderedListOutlined />),
+  getItem('Núcleos', '/nucleos', <ApiOutlined />),
 ];
 
 const LayoutPage = ({ children }) => {
@@ -44,7 +45,7 @@ const LayoutPage = ({ children }) => {
           theme="dark"
           defaultSelectedKeys={['/']}
           mode="inline" items={items}
-          onClick={({key}) => {
+          onClick={({ key }) => {
             navigate(key);
           }}
         />
