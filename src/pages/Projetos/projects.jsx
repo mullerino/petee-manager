@@ -3,13 +3,19 @@ import { fetchProjects } from "../../fetchs";
 
 import styles from './projects.module.css';
 
-import { Space, Table, Tag, Spin, Tooltip } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import Content from '../../components/content/content';
+import { useModalContext } from '../../contexts/modalForm';
+import Actions from '../../components/actions/actions';
 
 const Projects = () => {
   const { data: projetos, isLoading, isError } = useQuery('projetos', fetchProjects, {
     staleTime: 60000
   })
+
+  const { openModal, editRegister } = useModalContext();
+
+  // Alerta gambiarra, caso o botão de editar não seja o clicado, todos os campos são obrigatórios!!
+  const requiredField = !openModal.editMode  
 
   const columns = [
     {
@@ -44,14 +50,7 @@ const Projects = () => {
       title: 'Ações',
       key: 'action',
       render: (_, record) => (
-        <Space size="middle">
-          <Tooltip placement='bottom' title="Editar">
-            <a><EditOutlined /></a>
-          </Tooltip>
-          <Tooltip placement='bottom' title="Deletar">
-            <a><DeleteOutlined /></a>
-          </Tooltip>
-        </Space>
+        <Actions record={record} />
       ),
     },
   ];
@@ -67,20 +66,49 @@ const Projects = () => {
     )
   })
 
+  const fields = [
+    {
+      name: 'nome',
+      label: 'Nome',
+      required: requiredField,
+      type: 'input',
+      typeData: 'text'
+    },
+    {
+      name: 'descricao',
+      label: 'Descrição',
+      required: requiredField,
+      type: 'textarea',
+      typeData: 'text'
+    },
+    {
+      name: 'resumo',
+      label: 'Resumo',
+      required: requiredField,
+      type: 'textarea',
+      typeData: 'text'
+    },
+    {
+      name: 'area',
+      label: 'Núcleo',
+      required: requiredField,
+      type: 'select',
+      optionsSelect: [
+        { value: '1', label: 'Núcleo 1' },
+        { value: '2', label: 'Núcleo 2' },
+      ],
+      typeData: 'any'
+    },
+  ]
+
   return (
-    <div className={styles.table}>
-      <Table
+    <div>
+      <Content
+        data={data}
         columns={columns}
-        dataSource={data}
-        loading={{
-          indicator: <Spin />,
-          spinning: isLoading
-        }}
-        pagination={{
-          defaultPageSize: 6,
-          showSizeChanger: true,
-          pageSizeOptions: ['6', '10', '15']
-        }}
+        isLoading={isLoading}
+        tooltipAdding={'Adicionar novo projeto'}
+        fields={fields}
       />
     </div>
   )

@@ -3,13 +3,19 @@ import { fetchAreas } from "../../fetchs";
 
 import styles from './nucleos.module.css';
 
-import { Space, Table, Spin, Tooltip, Button } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import Content from '../../components/content/content';
+import { useModalContext } from '../../contexts/modalForm';
+import Actions from '../../components/actions/actions';
 
 const Nucleos = () => {
   const { data: areas, isLoading, isError } = useQuery('areas', fetchAreas, {
     staleTime: 60000
   })
+
+  const { openModal, editRegister } = useModalContext();
+
+  // Alerta gambiarra, caso o botão de editar não seja o clicado, todos os campos são obrigatórios!!
+  const requiredField = !openModal.editMode  
 
   const columns = [
     {
@@ -44,14 +50,7 @@ const Nucleos = () => {
       title: 'Ações',
       key: 'action',
       render: (_, record) => (
-        <Space size="middle">
-          <Tooltip placement='bottom' title="Editar">
-            <a><EditOutlined /></a>
-          </Tooltip>
-          <Tooltip placement='bottom' title="Deletar">
-            <a><DeleteOutlined /></a>
-          </Tooltip>
-        </Space>
+        <Actions record={record} />
       ),
     },
   ];
@@ -67,28 +66,32 @@ const Nucleos = () => {
     )
   })
 
+  const fields = [
+    {
+      name: 'nome',
+      label: 'Nome',
+      required: requiredField,
+      type: 'input',
+      typeData: 'text'
+    },
+    {
+      name: 'descricao',
+      label: 'Descrição',
+      required: requiredField,
+      type: 'textarea',
+      typeData: 'text'
+    },
+  ]
+
   return (
-    <div className={styles.container}>
-      <div className={styles.actions}>
-        <Tooltip  placement='bottom' title="Adicionar novo núcleo">
-          <Button type="primary" shape="circle" icon={<PlusOutlined />} size='large'/>
-        </Tooltip>
-      </div>
-      <div className={styles.table}>
-        <Table
-          columns={columns}
-          dataSource={data}
-          loading={{
-            indicator: <Spin />,
-            spinning: isLoading
-          }}
-          pagination={{
-            defaultPageSize: 6,
-            showSizeChanger: true,
-            pageSizeOptions: ['6', '10', '15']
-          }}
-        />
-      </div>
+    <div>
+      <Content
+        data={data}
+        columns={columns}
+        isLoading={isLoading}
+        tooltipAdding={'Adicionar novo núcleo'}
+        fields={fields}
+      />
     </div>
   )
 }

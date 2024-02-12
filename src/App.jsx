@@ -1,13 +1,17 @@
-import { QueryClient, QueryClientProvider } from 'react-query';
 import RoutesApp from './routes';
-
-const queryClient = new QueryClient();
+import { ModalProvider } from './contexts/modalForm';
+import { QueryClientContextProvider } from './contexts/useQuery';
+import { NotificationProvider } from './contexts/notification';
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RoutesApp/>
-    </QueryClientProvider>
+    <QueryClientContextProvider>
+      <NotificationProvider>
+        <ModalProvider>
+          <RoutesApp />
+        </ModalProvider>
+      </NotificationProvider>
+    </QueryClientContextProvider>
   )
 }
 
