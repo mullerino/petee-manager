@@ -1,9 +1,26 @@
 import { Space, Tooltip, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { useModalContext } from '../../contexts/modalForm';
+import { useMutation } from 'react-query'
+import { deletePetiano } from '../../fetchs';
+import { useQueryClient } from '../../contexts/useQuery';
+import { useNotification } from '../../contexts/notification';
 
 const Actions = ({ record }) => {
   const { editRegister } = useModalContext();
+  const { queryClientInstance } = useQueryClient();
+  const { openNotification } = useNotification();
+  const { mutate } = useMutation(deletePetiano, {
+    onSuccess: (response) => {
+      openNotification('Deu tudo certo', `${response.message}!`, true);
+      queryClientInstance.invalidateQueries('petianos');
+    }
+  }
+  );
+
+  const onDeletePetiano = (id) => {
+    mutate(id)
+  };
 
   return (
     <Space size="middle">
@@ -26,6 +43,9 @@ const Actions = ({ record }) => {
             }
             okButtonProps={{
               danger: true
+            }}
+            onConfirm={() => {
+              onDeletePetiano(record.key)
             }}
           >
             <DeleteOutlined />
