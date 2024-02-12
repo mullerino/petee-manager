@@ -10,9 +10,7 @@ import { useModalContext } from '../../contexts/modalForm';
 import Actions from '../../components/actions/actions';
 
 const Home = () => {
-  const { data: petianos, isLoading, isError } = useQuery('petianos', fetchPetianos, {
-    staleTime: 60000
-  })
+  const { data: petianos, isLoading } = useQuery('petianos', fetchPetianos)
 
   const { openModal } = useModalContext();
 
