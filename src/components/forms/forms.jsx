@@ -1,8 +1,9 @@
 import { Form, Input, Modal, Radio, Select } from 'antd';
 import { useModalContext } from '../../contexts/modalForm';
+import { useFormContext } from '../../contexts/form';
 
 const Forms = ({ onCreate, onCancel, fields, title }) => {
-  const [form] = Form.useForm();
+  const form = useFormContext();
   const { openModal } = useModalContext();
 
   return (
@@ -46,7 +47,7 @@ const Forms = ({ onCreate, onCancel, fields, title }) => {
             ]}
           >
             {field.type === 'textarea' ? (
-              <Input.TextArea />
+              <Input.TextArea placeholder={field.placeholder}/>
             ) : field.type === 'radio' ? (
               <Radio.Group>
                 {field.options.map(option => (
@@ -57,7 +58,7 @@ const Forms = ({ onCreate, onCancel, fields, title }) => {
               </Radio.Group>
             ) : field.type === 'select' ?
               <Select>
-                {field.optionsSelect.map(option => (
+                {field.optionsSelect?.map(option => (
                   <Select.Option key={option.value} value={option.value}>
                     {option.label}
                   </Select.Option>
