@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { fetchAreas } from "../../fetchs";
+import { deleteNucleo, editNucleo, fetchAreas, registerNewNucleo } from "../../fetchs";
 
 import styles from './nucleos.module.css';
 
@@ -8,14 +8,33 @@ import { useModalContext } from '../../contexts/modalForm';
 import Actions from '../../components/actions/actions';
 
 const Nucleos = () => {
-  const { data: areas, isLoading, isError } = useQuery('areas', fetchAreas, {
+  const keyQuery = 'areas'
+  const { data: areas, isLoading } = useQuery(keyQuery, fetchAreas, {
     staleTime: 60000
   })
 
-  const { openModal, editRegister } = useModalContext();
+  const { openModal } = useModalContext();
 
   // Alerta gambiarra, caso o botão de editar não seja o clicado, todos os campos são obrigatórios!!
-  const requiredField = !openModal.editMode  
+  const requiredField = !openModal.editMode;
+
+  const fields = [
+    {
+      name: 'nome',
+      label: 'Nome',
+      required: requiredField,
+      type: 'input',
+      typeData: 'text'
+    },
+    {
+      name: 'descricao',
+      label: 'Descrição',
+      required: requiredField,
+      type: 'textarea',
+      typeData: 'text'
+    },
+  ]
+
 
   const columns = [
     {
@@ -50,7 +69,7 @@ const Nucleos = () => {
       title: 'Ações',
       key: 'action',
       render: (_, record) => (
-        <Actions record={record} />
+        <Actions record={record} deleteTypeRegister={deleteNucleo} fieldsForms={fields} data={areas} keyQuery={keyQuery} />
       ),
     },
   ];
@@ -66,23 +85,6 @@ const Nucleos = () => {
     )
   })
 
-  const fields = [
-    {
-      name: 'nome',
-      label: 'Nome',
-      required: requiredField,
-      type: 'input',
-      typeData: 'text'
-    },
-    {
-      name: 'descricao',
-      label: 'Descrição',
-      required: requiredField,
-      type: 'textarea',
-      typeData: 'text'
-    },
-  ]
-
   return (
     <div>
       <Content
@@ -91,6 +93,9 @@ const Nucleos = () => {
         isLoading={isLoading}
         tooltipAdding={'Adicionar novo núcleo'}
         fields={fields}
+        addRegister={registerNewNucleo}
+        editRegister={editNucleo}
+        keyQuery={keyQuery}
       />
     </div>
   )

@@ -5,49 +5,69 @@ import { Tooltip, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons'
 import Forms from '../forms/forms';
 import { useModalContext } from '../../contexts/modalForm';
-import { registerNewPetiano } from '../../fetchs';
 import { useEffect } from 'react';
 import { useQueryClient } from '../../contexts/useQuery';
 import { useNotification } from '../../contexts/notification';
+import { useFormContext } from '../../contexts/form';
 
 
-const Content = ({ data, columns, isLoading, tooltipAdding, fields }) => {
-  const { openModal, addNewRegister, closeModal } = useModalContext();
+const Content = ({ data, columns, isLoading, tooltipAdding, fields, addRegister, editRegister, keyQuery }) => {
+  const { openModal, addNewRegister, closeModal, idEditRegister } = useModalContext();
   const { queryClientInstance } = useQueryClient();
-  const { mutate, isSuccess, isError} = useMutation(registerNewPetiano, {
+  const form = useFormContext();
+
+  const { mutate, isSuccess, isError } = useMutation(addRegister, {
     onSuccess: () => {
-      queryClientInstance.invalidateQueries('petianos');
+      queryClientInstance.invalidateQueries(keyQuery);
+      openNotification('Deu certo', `Informação submetida com sucesso!`, true);
     }
   });
+
+  const { mutate: editOneRegister } = useMutation(editRegister, {
+    onSuccess: ({ message }) => {
+      queryClientInstance.invalidateQueries(keyQuery);
+      openNotification('Deu certo', `${message}!`, true);
+    }
+  });
+
   const { openNotification } = useNotification();
 
   const onCreate = (dataFromForm) => {
     console.log('Received values of form: ', dataFromForm);
+
+    if (!Array.isArray(dataFromForm.imgs)) {
+      dataFromForm.imgs = dataFromForm.imgs.split(',');
+    }
+
+    if (openModal.editMode) {
+      editOneRegister({ data: dataFromForm, id: idEditRegister });
+      closeModal();
+      return
+    }
+
     mutate(dataFromForm);
     closeModal();
   };
 
   useEffect(() => {
-    if (isSuccess || isError) {
-      const notificationTitle = isSuccess ? 'Deu tudo certo' : 'Algo deu errado';
-      const notificationMessage = isSuccess ? 'As informações inseridas no formulário foram submetidas.' : 'As informações inseridas no formulário não foram submetidas.';
-      
-      openNotification(notificationTitle, notificationMessage, isSuccess);
+    if (isError) {
+      openNotification('Algo deu errado', 'As informações inseridas no formulário não foram submetidas.', isSuccess);
     }
 
-  }, [isSuccess, isError])
+  }, [isError])
 
   return (
     <div className={styles.container}>
       <div className={styles.actions}>
         <Tooltip placement='bottom' title={tooltipAdding}>
-          <Button 
-            type="primary" 
-            shape="circle" 
-            icon={<PlusOutlined />} 
+          <Button
+            type="primary"
+            shape="circle"
+            icon={<PlusOutlined />}
             size='large'
             onClick={() => {
-              addNewRegister()
+              form.resetFields();
+              addNewRegister();
             }}
           />
         </Tooltip>
@@ -58,8 +78,6 @@ const Content = ({ data, columns, isLoading, tooltipAdding, fields }) => {
             closeModal()
           }}
           fields={fields}
-          errorSubmit={isError}
-          sucessSubmit={isSuccess}
         />
       </div>
       <div>
