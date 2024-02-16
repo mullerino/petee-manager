@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { fetchPetianos } from "../../fetchs";
+import { deletePetiano, editPetiano, fetchPetianos, registerNewPetiano } from "../../fetchs";
 
 import styles from './home.module.css';
 
@@ -10,72 +10,13 @@ import { useModalContext } from '../../contexts/modalForm';
 import Actions from '../../components/actions/actions';
 
 const Home = () => {
-  const { data: petianos, isLoading } = useQuery('petianos', fetchPetianos)
+  const keyQuery = 'petianos'
+  const { data: petianos, isLoading } = useQuery(keyQuery, fetchPetianos)
 
   const { openModal } = useModalContext();
 
   // Alerta gambiarra, caso o botão de editar não seja o clicado, todos os campos são obrigatórios!!
-  const requiredField = !openModal.editMode
-
-  const columns = [
-    {
-      title: 'Nome',
-      dataIndex: 'nome',
-      key: 'nome',
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: 'Semestre de ingresso no PET',
-      dataIndex: 'semestreIngresso',
-      key: 'semestreIngresso',
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Situação',
-      key: 'tag',
-      dataIndex: 'tag',
-      render: (_, { tag }) => {
-        const color = tag === true ? 'green' : 'red';
-
-        const state = {
-          green: 'Ativo',
-          red: 'Desligado'
-        }
-
-        return (
-          <>
-            <Tag color={color} key={'a'}>
-              {state[color]}
-            </Tag>
-          </>
-        );
-      }
-
-    },
-    {
-      title: 'Ações',
-      key: 'action',
-      render: (_, record) => (
-        <Actions record={record}/>
-      ),
-    },
-  ];
-
-  const data = petianos?.map((petiano) => {
-    return (
-      {
-        key: petiano.id,
-        nome: petiano.nome,
-        semestreIngresso: petiano.semestreingresso,
-        email: petiano.email,
-        tag: petiano.ativo,
-      }
-    )
-  })
+  const requiredField = !openModal.editMode;
 
   const fields = [
     {
@@ -156,6 +97,73 @@ const Home = () => {
     },
   ];
 
+  const columns = [
+    {
+      title: 'Nome',
+      dataIndex: 'nome',
+      key: 'nome',
+      render: (text) => <span>{text}</span>,
+    },
+    {
+      title: 'Descrição',
+      dataIndex: 'descricao',
+      key: 'descricao',
+      render: (text) => <span>{text}</span>,
+    },
+    {
+      title: 'Semestre de ingresso no PET',
+      dataIndex: 'semestreIngresso',
+      key: 'semestreIngresso',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: 'Situação',
+      key: 'tag',
+      dataIndex: 'tag',
+      render: (_, { tag }) => {
+        const color = tag === true ? 'green' : 'red';
+
+        const state = {
+          green: 'Ativo',
+          red: 'Desligado'
+        }
+
+        return (
+          <>
+            <Tag color={color} key={'a'}>
+              {state[color]}
+            </Tag>
+          </>
+        );
+      }
+
+    },
+    {
+      title: 'Ações',
+      key: 'action',
+      render: (_, record) => (
+        <Actions record={record} deleteTypeRegister={deletePetiano} keyQuery={keyQuery} fieldsForms={fields} data={petianos}/>
+      ),
+    },
+  ];
+
+  const data = petianos?.map((petiano) => {
+    return (
+      {
+        key: petiano.id,
+        nome: petiano.nome,
+        descricao: petiano.descricao,
+        semestreIngresso: petiano.semestreingresso,
+        email: petiano.email,
+        tag: petiano.ativo,
+      }
+    )
+  })
+
   return (
     <div className={styles.container}>
       <Content
@@ -164,6 +172,9 @@ const Home = () => {
         isLoading={isLoading}
         tooltipAdding={'Adicionar novo petiano'}
         fields={fields}
+        addRegister={registerNewPetiano}
+        editRegister={editPetiano}
+        keyQuery={keyQuery}
       />
     </div>
   )
