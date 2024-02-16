@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { fetchProjects } from "../../fetchs";
+import { deleteProject, editProject, fetchAreas, fetchProjects, registerProject } from "../../fetchs";
 
 import styles from './projects.module.css';
 
@@ -8,63 +8,23 @@ import { useModalContext } from '../../contexts/modalForm';
 import Actions from '../../components/actions/actions';
 
 const Projects = () => {
-  const { data: projetos, isLoading, isError } = useQuery('projetos', fetchProjects, {
+  const keyQuery = 'projetos';
+  const { data: projetos, isLoading } = useQuery(keyQuery, fetchProjects, {
     staleTime: 60000
   })
+  const { data: nucleos } = useQuery('nucleos', fetchAreas);
 
-  const { openModal, editRegister } = useModalContext();
+  const dataToSelectNucleos = nucleos?.map(nucleo => {
+    return {
+      value: nucleo.id,
+      label: nucleo.nome
+    }
+  });
+
+  const { openModal } = useModalContext();
 
   // Alerta gambiarra, caso o botão de editar não seja o clicado, todos os campos são obrigatórios!!
-  const requiredField = !openModal.editMode  
-
-  const columns = [
-    {
-      title: 'Nome',
-      dataIndex: 'nome',
-      key: 'nome',
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: 'Descrição',
-      dataIndex: 'descricao',
-      key: 'descricao',
-      width: '40%'
-    },
-    {
-      title: 'Imagens',
-      dataIndex: 'imgs',
-      key: 'imgs',
-      render: (_, {imgs}) => {
-        return (
-          <div>
-            {imgs.map((img, index) => (
-              <a key={index} href={img} target="_blank" rel="noopener noreferrer">
-                Imagem {index + 1}<br></br>
-              </a>
-            ))}
-          </div>
-        );
-      },
-    },
-    {
-      title: 'Ações',
-      key: 'action',
-      render: (_, record) => (
-        <Actions record={record} />
-      ),
-    },
-  ];
-
-  const data = projetos?.map((projeto) => {
-    return (
-      {
-        key: projeto.id,
-        nome: projeto.nome,
-        descricao: projeto.descricao,
-        imgs: projeto.imgs
-      }
-    )
-  })
+  const requiredField = !openModal.editMode;
 
   const fields = [
     {
@@ -89,17 +49,71 @@ const Projects = () => {
       typeData: 'text'
     },
     {
-      name: 'area',
+      name: 'imgs',
+      label: 'Imagens do projeto',
+      required: requiredField,
+      type: 'textarea',
+      placeholder: 'Ex: www.image.com,www.image1.com,www.image2.com',
+      typeData: 'text'
+    },
+    {
+      name: 'areaId',
       label: 'Núcleo',
       required: requiredField,
       type: 'select',
-      optionsSelect: [
-        { value: '1', label: 'Núcleo 1' },
-        { value: '2', label: 'Núcleo 2' },
-      ],
+      optionsSelect: dataToSelectNucleos,
       typeData: 'any'
     },
-  ]
+  ];
+
+  const columns = [
+    {
+      title: 'Nome',
+      dataIndex: 'nome',
+      key: 'nome',
+      render: (text) => <span>{text}</span>,
+    },
+    {
+      title: 'Descrição',
+      dataIndex: 'descricao',
+      key: 'descricao',
+      width: '40%'
+    },
+    {
+      title: 'Imagens',
+      dataIndex: 'imgs',
+      key: 'imgs',
+      render: (_, { imgs }) => {
+        return (
+          <div>
+            {imgs.map((img, index) => (
+              <a key={index} href={img} target="_blank" rel="noopener noreferrer">
+                Imagem {index + 1}<br></br>
+              </a>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      title: 'Ações',
+      key: 'action',
+      render: (_, record) => (
+        <Actions record={record} deleteTypeRegister={deleteProject} keyQuery={keyQuery} data={projetos} fieldsForms={fields} />
+      ),
+    },
+  ];
+
+  const data = projetos?.map((projeto) => {
+    return (
+      {
+        key: projeto.id,
+        nome: projeto.nome,
+        descricao: projeto.descricao,
+        imgs: projeto.imgs
+      }
+    )
+  })
 
   return (
     <div>
@@ -109,6 +123,9 @@ const Projects = () => {
         isLoading={isLoading}
         tooltipAdding={'Adicionar novo projeto'}
         fields={fields}
+        addRegister={registerProject}
+        editRegister={editProject}
+        keyQuery={keyQuery}
       />
     </div>
   )
