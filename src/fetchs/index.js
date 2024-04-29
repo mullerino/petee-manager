@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const axiosInstance = axios.create({
-  baseURL: 'https://peteedeploy-api.onrender.com/api/'
+  baseURL: 'https://server.peteeufrn.xyz/api/'
 })
 
 export const fetchProjects = async () => {
