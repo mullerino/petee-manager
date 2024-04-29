@@ -35,7 +35,7 @@ const Content = ({ data, columns, isLoading, tooltipAdding, fields, addRegister,
   const onCreate = (dataFromForm) => {
     console.log('Received values of form: ', dataFromForm);
 
-    if (!Array.isArray(dataFromForm.imgs)) {
+    if (dataFromForm.imgs && !Array.isArray(dataFromForm.imgs)) {
       dataFromForm.imgs = dataFromForm.imgs.split(',');
     }
 

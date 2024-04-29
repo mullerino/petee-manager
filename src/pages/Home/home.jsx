@@ -66,7 +66,7 @@ const Home = () => {
       label: 'URL da foto do petiano',
       required: requiredField,
       type: 'input',
-      typeData: 'url'
+      typeData: 'string'
     },
     {
       name: 'linkedln',
