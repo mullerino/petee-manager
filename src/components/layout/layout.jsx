@@ -43,7 +43,7 @@ const LayoutPage = ({ children }) => {
         </div>
         <Menu
           theme="dark"
-          defaultSelectedKeys={['/']}
+          defaultSelectedKeys={['/petianos']}
           mode="inline" items={items}
           onClick={({ key }) => {
             navigate(key);
