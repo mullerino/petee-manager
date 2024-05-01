@@ -20,7 +20,7 @@ function getItem(label, key, icon) {
 }
 
 const items = [
-  getItem('Petianos', '/', <UnorderedListOutlined />),
+  getItem('Petianos', '/petianos', <UnorderedListOutlined />),
   getItem('Projetos', '/projects', <DesktopOutlined />),
   getItem('Núcleos', '/nucleos', <ApiOutlined />),
 ];
